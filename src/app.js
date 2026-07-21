@@ -1,0 +1,13 @@
+const express=require('express');
+const cors=require('cors');
+const morgan=require('morgan');
+const helmet=require('helmet');
+const adminRoutes = require("./routes/adminRoutes");
+const app=express();
+app.use(cors());app.use(helmet());
+app.use(morgan('dev'));
+app.use(express.json());
+app.use('/uploads',express.static('src/uploads'));
+app.use('/api/products',require('./routes/productRoutes'));
+app.use("/api/admin", adminRoutes);
+module.exports=app;
