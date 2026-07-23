@@ -1,6 +1,59 @@
-const Product=require('../models/Product');
-exports.create=async(req,res)=>{const p=await Product.create({...req.body,image:req.file?req.file.filename:null});res.json(p);}
-exports.getAll=async(req,res)=>res.json(await Product.findAll());
-exports.getOne=async(req,res)=>res.json(await Product.findByPk(req.params.id));
-exports.update=async(req,res)=>{const p=await Product.findByPk(req.params.id);if(!p)return res.sendStatus(404);await p.update({...req.body,image:req.file?req.file.filename:p.image});res.json(p);}
-exports.remove=async(req,res)=>{const p=await Product.findByPk(req.params.id);if(!p)return res.sendStatus(404);await p.destroy();res.json({message:'Deleted'});}
+const Product = require("../models/Product");
+
+exports.create = async (req, res) => {
+  try {
+    const slug = req.body.name
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
+
+    const product = await Product.create({
+      product_code: `PRD-${Date.now()}`,
+      name: req.body.name,
+      slug,
+      category: req.body.category,
+      short_description: req.body.short_description || "",
+      description: req.body.description || "",
+      price: req.body.price,
+      discount_price: req.body.discount_price || 0,
+      stock: req.body.stock || 0,
+      image: req.body.thumbnail || "",
+      gallery: req.body.images || [],
+      featured: req.body.isFeatured || false,
+      status: "active",
+      meta_title: req.body.meta_title || req.body.name,
+      meta_description: req.body.meta_description || req.body.description,
+    });
+
+    res.status(201).json({
+      status: true,
+      data: product,
+    });
+  } catch (err) {
+    console.error(err);
+
+    res.status(500).json({
+      status: false,
+      message: err.message,
+    });
+  }
+};
+exports.getAll = async (req, res) => res.json(await Product.findAll());
+exports.getOne = async (req, res) =>
+  res.json(await Product.findByPk(req.params.id));
+exports.update = async (req, res) => {
+  const p = await Product.findByPk(req.params.id);
+  if (!p) return res.sendStatus(404);
+  await p.update({
+    ...req.body,
+    image: req.file ? req.file.filename : p.image,
+  });
+  res.json(p);
+};
+exports.remove = async (req, res) => {
+  const p = await Product.findByPk(req.params.id);
+  if (!p) return res.sendStatus(404);
+  await p.destroy();
+  res.json({ message: "Deleted" });
+};

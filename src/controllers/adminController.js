@@ -1,27 +1,26 @@
 const jwt = require("jsonwebtoken");
 
 const ADMIN = {
-  username: "yash",
-  password: "yash",
+    email: "yash@vidyagxp.com",
+    password: "yash"
 };
-
 exports.login = async (req, res) => {
   try {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     if (
-      username !== ADMIN.username ||
+      email !== ADMIN.email ||
       password !== ADMIN.password
     ) {
       return res.status(401).json({
         status: false,
-        message: "Invalid username or password",
+        message: "Invalid email or password",
       });
     }
 
     const token = jwt.sign(
       {
-        username: ADMIN.username,
+        email: ADMIN.email,
         role: "admin",
       },
       process.env.JWT_SECRET,
@@ -34,13 +33,14 @@ exports.login = async (req, res) => {
       status: true,
       message: "Login Successful",
       token,
-      admin: {
-        username: ADMIN.username,
+      user: {
+        name: "Admin",
+        email: ADMIN.email,
         role: "admin",
       },
     });
   } catch (err) {
-    return res.status(500).json({
+    res.status(500).json({
       status: false,
       message: err.message,
     });

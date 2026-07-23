@@ -1,3 +1,11 @@
-const multer=require('multer');
-const storage=multer.diskStorage({destination:'src/uploads/products',filename:(r,f,cb)=>cb(null,Date.now()+'-'+f.originalname)});
-module.exports=multer({storage});
+const multer = require("multer");
+const path = require("path");
+
+const storage = multer.diskStorage({
+  destination: "src/uploads",
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+module.exports = multer({ storage });
