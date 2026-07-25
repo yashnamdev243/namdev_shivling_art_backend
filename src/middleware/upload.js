@@ -1,10 +1,21 @@
 const multer = require("multer");
 const path = require("path");
 
+// const storage = multer.diskStorage({
+//   destination: "uploads",
+//   filename: (req, file, cb) => {
+//     cb(null, Date.now() + path.extname(file.originalname));
+//   },
+// });
 const storage = multer.diskStorage({
-  destination: "src/uploads",
+  destination: (req, file, cb) => {
+    console.log("Saving to:", "uploads");
+    cb(null, "uploads");
+  },
   filename: (req, file, cb) => {
-    cb(null, Date.now() + path.extname(file.originalname));
+    const name = Date.now() + path.extname(file.originalname);
+    console.log("Filename:", name);
+    cb(null, name);
   },
 });
 
