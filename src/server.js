@@ -2,6 +2,7 @@ require("dotenv").config();
 require("./models/Product");
 require("./models/Product");
 require("./models/Category");
+require("./models/Contact");
 
 const app = require("./app");
 
