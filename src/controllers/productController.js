@@ -93,7 +93,6 @@
 
 
 const Product = require("../models/Product");
-const { Op, Sequelize } = require("sequelize");
 
 exports.create = async (req, res) => {
   try {
@@ -113,8 +112,8 @@ exports.create = async (req, res) => {
       price: req.body.price,
       discount_price: req.body.discount_price || 0,
       stock: req.body.stock || 0,
-      image: req.body.image || "",
-      gallery: req.body.gallery || [],
+      image: req.body.thumbnail || "",
+      gallery: req.body.images || [],
       featured: req.body.isFeatured || false,
       status: "active",
       meta_title: req.body.meta_title || req.body.name,
@@ -194,16 +193,11 @@ exports.getOne = async (req, res) =>
 
 exports.update = async (req, res) => {
   const p = await Product.findByPk(req.params.id);
-
   if (!p) return res.sendStatus(404);
-
   await p.update({
     ...req.body,
-    image: req.file
-      ? req.file.filename
-      : req.body.image || p.image,
+    image: req.file ? req.file.filename : p.image,
   });
-
   res.json(p);
 };
 
@@ -212,30 +206,4 @@ exports.remove = async (req, res) => {
   if (!p) return res.sendStatus(404);
   await p.destroy();
   res.json({ message: "Deleted" });
-};
-
-exports.getRandom = async (req, res) => {
-  try {
-    const limit = Number(req.query.limit) || 8;
-
-    const products = await Product.findAll({
-      where: {
-        image: {
-          [Op.ne]: null,
-        },
-      },
-      order: Sequelize.literal("RAND()"),
-      limit,
-    });
-
-    res.json({
-      success: true,
-      products,
-    });
-  } catch (err) {
-    res.status(500).json({
-      success: false,
-      message: err.message,
-    });
-  }
 };

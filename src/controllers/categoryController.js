@@ -3,7 +3,7 @@ const Category = require("../models/Category");
 
 exports.create = async (req, res) => {
   try {
-    const { name, description, image } = req.body;
+    const { name, description } = req.body;
 
     const exists = await Category.findOne({
       where: { name },
@@ -19,7 +19,7 @@ exports.create = async (req, res) => {
     const category = await Category.create({
       name,
       description,
-      image, // <-- use image from body
+      image: req.file ? `/uploads/${req.file.filename}` : null,
     });
 
     return res.status(201).json({
@@ -112,7 +112,9 @@ exports.update = async (req, res) => {
     await category.update({
       name: req.body.name,
       description: req.body.description,
-      image: req.body.image,
+      image: req.file
+        ? `/uploads/${req.file.filename}`
+        : category.image,
     });
 
     return res.json({

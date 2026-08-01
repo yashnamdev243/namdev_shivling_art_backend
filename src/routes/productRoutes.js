@@ -4,9 +4,7 @@ const up = require("../middleware/upload");
 
 r.post("/", up.single("image"), c.create);
 r.get("/", c.getAll);
-r.get("/random", c.getRandom);
 r.get("/:id", c.getOne);
-r.put("/:id", c.update);
+r.put("/:id", up.single("image"), c.update);
 r.delete("/:id", c.remove);
-
 module.exports = r;
