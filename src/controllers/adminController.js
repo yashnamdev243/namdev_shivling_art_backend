@@ -1,55 +1,47 @@
 const jwt = require("jsonwebtoken");
 
-const ADMIN = {
-    email: "yash@vidyagxp.com",
-    password: "yash"
-};
+function configuredAdmin() {
+  return {
+    email: String(process.env.ADMIN_EMAIL || "").trim().toLowerCase(),
+    password: String(process.env.ADMIN_PASSWORD || ""),
+    name: process.env.ADMIN_NAME || "Website Admin",
+  };
+}
+
 exports.login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const email = String(req.body.email || "").trim().toLowerCase();
+    const password = String(req.body.password || "");
+    const admin = configuredAdmin();
 
-    if (
-      email !== ADMIN.email ||
-      password !== ADMIN.password
-    ) {
-      return res.status(401).json({
-        status: false,
-        message: "Invalid email or password",
-      });
+    if (!process.env.JWT_SECRET || !admin.email || !admin.password) {
+      return res.status(500).json({ success: false, message: "Admin login is not configured on the server." });
+    }
+
+    if (email !== admin.email || password !== admin.password) {
+      return res.status(401).json({ success: false, message: "Invalid admin email or password." });
     }
 
     const token = jwt.sign(
-      {
-        email: ADMIN.email,
-        role: "admin",
-      },
+      { email: admin.email, role: "admin", type: "admin", name: admin.name },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "1d",
-      }
+      { expiresIn: process.env.ADMIN_JWT_EXPIRES_IN || "1d" }
     );
 
     return res.json({
-      status: true,
-      message: "Login Successful",
+      success: true,
+      message: "Admin login successful.",
       token,
-      user: {
-        name: "Admin",
-        email: ADMIN.email,
-        role: "admin",
-      },
+      user: { name: admin.name, email: admin.email, role: "admin" },
     });
-  } catch (err) {
-    res.status(500).json({
-      status: false,
-      message: err.message,
-    });
+  } catch (error) {
+    console.error("ADMIN LOGIN ERROR:", error);
+    return res.status(500).json({ success: false, message: "Admin login failed." });
   }
 };
 
-exports.logout = async (req, res) => {
-  return res.json({
-    status: true,
-    message: "Logout Successful",
-  });
-};
+exports.logout = (_req, res) => res.json({ success: true, message: "Admin logout successful." });
+exports.me = (req, res) => res.json({
+  success: true,
+  user: { name: req.admin.name || "Admin", email: req.admin.email, role: "admin" },
+});

@@ -1,29 +1,25 @@
-const Product = require("../models/Product");
-const Category = require("../models/Category");
+const { Product, Category, User, Review, ProductLike, Wishlist, CouponRedemption } = require("../models");
 
-exports.getStats = async (req, res) => {
+exports.getStats = async (_req, res) => {
   try {
-    const totalProducts = await Product.count();
-    const totalCategories = await Category.count();
+    const [totalProducts, totalCategories, outOfStock, totalUsers, totalReviews, totalLikes, totalWishlists, totalCouponUses] = await Promise.all([
+      Product.count(),
+      Category.count(),
+      Product.count({ where: { stock: 0 } }),
+      User.count({ where: { role: "user" } }),
+      Review.count(),
+      ProductLike.count(),
+      Wishlist.count(),
+      CouponRedemption.count(),
+    ]);
 
-    const outOfStock = await Product.count({
-      where: {
-        stock: 0,
-      },
+    return res.json({
+      success: true,
+      totalProducts, totalCategories, outOfStock,
+      totalUsers, totalReviews, totalLikes, totalWishlists, totalCouponUses,
     });
-
-    res.json({
-      status: true,
-      totalProducts,
-      totalCategories,
-      outOfStock,
-    });
-  } catch (err) {
-    console.error(err);
-
-    res.status(500).json({
-      status: false,
-      message: err.message,
-    });
+  } catch (error) {
+    console.error("DASHBOARD STATS:", error);
+    return res.status(500).json({ success: false, message: "Unable to load dashboard statistics." });
   }
 };
