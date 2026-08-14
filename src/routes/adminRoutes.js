@@ -24,14 +24,36 @@ router.patch("/reviews/:id/reject", reviews.reject);
 router.patch("/reviews/:id/feature", reviews.feature);
 router.delete("/reviews/:id", reviews.remove);
 
+/* Wishlist */
 router.get("/wishlists", wishlist.adminList);
+
+/* Likes */
 router.get("/likes", like.adminList);
 router.get("/products/:productId/likes", like.users);
 
-router.get("/coupons", coupons.adminList);
-router.post("/coupons", coupons.adminCreate);
-router.put("/coupons/:id", coupons.adminUpdate);
-router.delete("/coupons/:id", coupons.adminDelete);
-router.get("/coupons/redemptions", coupons.adminRedemptions);
+/* Coupons */
+
+router.get("/coupons/redemptions", coupons.adminRedemptions); 
+
+
+router.get(
+  "/coupons",
+  coupons.getAll
+);
+
+router.post(
+  "/coupons",
+  coupons.create
+);
+
+router.put(
+  "/coupons/:id",
+  coupons.update
+);
+
+router.delete(
+  "/coupons/:id",
+  coupons.remove
+);
 
 module.exports = router;
