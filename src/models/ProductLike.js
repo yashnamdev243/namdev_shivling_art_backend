@@ -1,23 +1,4 @@
 
-// const { DataTypes } = require("sequelize");
-// const sequelize = require("../config/database");
-
-// const ProductLike = sequelize.define("ProductLike", {
-//   id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-//   user_id: { type: DataTypes.INTEGER, allowNull: false },
-//   product_id: { type: DataTypes.INTEGER, allowNull: false },
-// }, {
-//   tableName: "product_likes",
-//   indexes: [
-//     { unique: true, fields: ["user_id", "product_id"] },
-//     { fields: ["product_id"] },
-//   ],
-// });
-
-// module.exports = ProductLike;
-
-
-
 const { DataTypes } = require("sequelize");
 const sequelize = require("../config/database");
 

@@ -1,5 +1,5 @@
 const { Op } = require("sequelize");
-
+const { ActivityLog } = require("../models");
 const Coupon = require("../models/Coupon");
 const Product = require("../models/Product");
 const User = require("../models/User");
@@ -475,6 +475,14 @@ exports.apply = async (req, res) => {
           order_amount: result.originalPrice,
           discount_amount: result.discount,
         });
+         await ActivityLog.create({
+            user_id: userId,
+            product_id: product.id,
+            action: "COUPON_APPLY",
+            metadata: { code: result.coupon.code, discount: result.discount, finalPrice: result.finalPrice },
+            ip_address: req.ip,
+            user_agent: req.get("user-agent") || null,
+          });
       } catch (logError) {
         console.error("COUPON REDEMPTION LOG ERROR:", logError);
         // don't fail the apply just because logging failed
