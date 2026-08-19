@@ -14,6 +14,7 @@ const wishlistRoutes = require("./routes/wishlistRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require("./routes/adminRoutes");
 const couponRoutes = require("./routes/couponRoutes");
+const { generalLimiter } = require("./middleware/rateLimiter");
 
 const app = express();
 
@@ -49,6 +50,7 @@ app.get("/api/health", (_req, res) =>
   }),
 );
 
+app.use("/api", generalLimiter); // apply after helmet/cors, before routes
 app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/categories", categoryRoutes);
@@ -61,24 +63,20 @@ app.use("/api/reviews", reviewRoutes);
 app.use("/api/coupons", couponRoutes);
 
 app.use((req, res) =>
-  res
-    .status(404)
-    .json({
-      success: false,
-      message: `Route not found: ${req.method} ${req.originalUrl}`,
-    }),
+  res.status(404).json({
+    success: false,
+    message: `Route not found: ${req.method} ${req.originalUrl}`,
+  }),
 );
 
 app.use((err, _req, res, _next) => {
   console.error("UNHANDLED ERROR:", err);
   const status =
     err.status || (err.message === "CORS origin not allowed." ? 403 : 500);
-  res
-    .status(status)
-    .json({
-      success: false,
-      message: status === 500 ? "Internal server error." : err.message,
-    });
+  res.status(status).json({
+    success: false,
+    message: status === 500 ? "Internal server error." : err.message,
+  });
 });
 
 module.exports = app;

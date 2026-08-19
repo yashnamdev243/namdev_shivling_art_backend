@@ -9,18 +9,25 @@ function getBearerToken(req) {
 function requireAdmin(req, res, next) {
   try {
     const token = getBearerToken(req);
-    if (!token) return res.status(401).json({ success: false, message: "Admin login required." });
+    if (!token)
+      return res
+        .status(401)
+        .json({ success: false, message: "Admin login required." });
 
     const payload = jwt.verify(token, process.env.JWT_SECRET);
 
     if (payload.role !== "admin" && payload.type !== "admin") {
-      return res.status(403).json({ success: false, message: "Admin access required." });
+      return res
+        .status(403)
+        .json({ success: false, message: "Admin access required." });
     }
 
     req.admin = payload;
     next();
   } catch (error) {
-    return res.status(401).json({ success: false, message: "Invalid or expired admin token." });
+    return res
+      .status(401)
+      .json({ success: false, message: "Invalid or expired admin token." });
   }
 }
 

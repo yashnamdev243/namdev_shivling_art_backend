@@ -6,11 +6,12 @@ const up = require("../middleware/upload");
 const { requireUser } = require("../middleware/auth");
 const optionalAuth = require("../middleware/optionalAuth");
 const { requireAdmin } = require("../middleware/adminAuth");
+const { actionLimiter } = require("../middleware/rateLimiter");
 
 router.get("/", c.getAll);
 router.get("/random", c.getRandom);
 router.post("/", requireAdmin, up.single("image"), c.create);
-router.post("/:productId/like", requireUser, like.toggle);
+router.post("/:productId/like", requireUser, actionLimiter, like.toggle);
 router.get("/:productId/like", optionalAuth, like.status);
 router.get("/:productId/likes", like.users);
 router.get("/:productId/reviews", reviews.listByProduct);

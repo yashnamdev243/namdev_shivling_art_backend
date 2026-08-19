@@ -45,3 +45,11 @@ async function start() {
 }
 
 start();
+
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received, shutting down gracefully");
+  server.close(() => {
+    sequelize.close();
+    process.exit(0);
+  });
+});

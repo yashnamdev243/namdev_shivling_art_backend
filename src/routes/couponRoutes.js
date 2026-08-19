@@ -1,7 +1,7 @@
 const router = require("express").Router();
-
 const couponController = require("../controllers/couponController");
 const { requireUser } = require("../middleware/auth");
+const { couponLimiter } = require("../middleware/rateLimiter");
 
 // Customer
 // router.post(
@@ -11,7 +11,7 @@ const { requireUser } = require("../middleware/auth");
 
 // router.get("/active", couponController.active);
 // Customer — must be logged in so we know whose history this is
-router.post("/apply", requireUser, couponController.apply);
+router.post("/apply", requireUser, couponLimiter, couponController.apply);
 router.get("/my-redemptions", requireUser, couponController.myRedemptions);
 router.get("/active", couponController.active); // must be above "/:id"
 
